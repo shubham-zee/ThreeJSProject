@@ -50,7 +50,7 @@ export default function ModelViewer() {
       <directionalLight position={[2, 2, 2]} intensity={1} />
       <Suspense fallback={null}>
         <Model
-          url="/models/house.glb"
+          url={process.env.PUBLIC_URL + "/models/house.glb"}
           isZoomed={isZoomed}
           setIsZoomed={setIsZoomed}
           targetZoom={targetZoom}
