@@ -1,10 +1,38 @@
-import React, { Suspense, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Sky } from "@react-three/drei";
 import * as THREE from "three";
 
 import { useMemo } from "react";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils";
+
+function FoxModel({ url, position }) {
+  const group = useRef();
+  const { scene, animations } = useGLTF(url);
+  const mixer = useRef();
+
+  useEffect(() => {
+    if (animations && scene) {
+      mixer.current = new THREE.AnimationMixer(scene);
+      animations.forEach((clip) => {
+        mixer.current.clipAction(clip).play();
+      });
+    }
+  }, [animations, scene]);
+
+  useFrame((state, delta) => {
+    mixer.current?.update(delta);
+  });
+
+  return (
+    <primitive
+      ref={group}
+      object={scene}
+      position={position}
+      scale={[0.02, 0.02, 0.02]}
+    />
+  );
+}
 
 function Model({ url, isZoomed, setIsZoomed, targetZoom, position }) {
   const { scene } = useGLTF(url);
@@ -69,6 +97,10 @@ export default function ModelViewer() {
           setIsZoomed={setIsZoomed}
           targetZoom={targetZoom}
           position={[0, 0, 0]}
+        />
+        <FoxModel
+          url={process.env.PUBLIC_URL + "/models/Fox/Fox.gltf"}
+          position={[-1, -0.5, -2]}
         />
       </Suspense>
 
